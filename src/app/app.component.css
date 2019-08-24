@@ -1,0 +1,36 @@
+.display-centre {
+    width: 50%;
+    margin: 0 auto;
+}
+
+.form-margin {
+    margin: 30px;
+}
+
+p-calendar /deep/ .ui-calendar {
+    width: 100%;
+}
+
+p-calendar /deep/ .ui-inputtext {
+    width: 84%;
+}
+
+.pull-right {
+    float: right;
+}
+
+.pull-left {
+    float: left;
+}
+
+p-autoComplete /deep/ .ui-autocomplete {
+    width: 100%;
+}
+
+p-autoComplete /deep/ .ui-autocomplete-input {
+    width: 100%;
+}
+
+.text-danger {
+    color: red;
+}

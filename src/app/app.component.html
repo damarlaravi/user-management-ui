@@ -1,21 +1,129 @@
 <!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-</div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/cli">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
+<p-card header="User Management Screen">
+    <hr class="ul-g-12" style="color: green; border: 1px solid;">
+    <div class="ul-g-12" [formGroup]="userManagementForm">
+        <div class="p-grid form-margin">
+            <div class="p-col-4">
+                <span class="ui-float-label">
+                    <input id="name-input" type="text" size="30" pInputText class="p-col-11" formControlName="name">
+                    <label for="name-input">Name</label>
+                </span>
+                <small class="text-danger" *ngIf="submitted && userManagementForm.get('name')?.errors">
+                    Please enter atleast 4 letters.
+                </small>
+            </div>
+            <div class="p-col-4">
+                <span class="ui-float-label">
+                    <input id="position-input" type="text" size="30" pInputText class="p-col-11" formControlName="position">
+                    <label for="position-input">Position</label>
+                </span>
+                <small class="text-danger" *ngIf="submitted && userManagementForm.get('position')?.errors">
+                    Please enter atleast 4 letters.
+                </small>
+            </div>
+            <div class="p-col-4">
+                <span class="ui-float-label">
+                    <p-autoComplete id="office-input" formControlName="office" [suggestions]="results"
+                                    (completeMethod)="search($event)" field="label" forceSelection="true">
+                    </p-autoComplete>
+                    <label for="office-input">Office</label>
+                </span>
+                <small class="text-danger" *ngIf="submitted && userManagementForm.get('office')?.errors">
+                    Please select office
+                </small>
+            </div>
+        </div>
+        <div class="p-grid form-margin">
+            <div class="p-col-4">
+                <span class="ui-float-label ">
+                    <input id="age-input" type="text" size="30" pInputText class="p-col-11" formControlName="age"
+                           maxlength="2" pKeyFilter="int">
+                    <label for="age-input">Age</label>
+                </span>
+                <small class="text-danger" *ngIf="submitted && userManagementForm.get('age')?.errors">
+                    Please enter valid user age 0 t0 99
+                </small>
+            </div>
+            <div class="p-col-4">
+                <span class="ui-float-label ">
+                    <p-calendar id="date-input" showIcon="true" dateFormat="dd/mm/yy" formControlName="date">
+                    </p-calendar>
+                    <label for="date-input">Date</label>
+                </span>
+                <small class="text-danger" *ngIf="submitted && userManagementForm.get('date')?.errors">
+                    Please select date
+                </small>
+            </div>
+        </div>
+    </div>
+    <div class="p-grid form-margin">
+        <div class="p-col-8">
+        </div>
+        <div class="p-col-4">
+            <div style="float: right">
+                <p-button label="SAVE" (click)="saveHandler()"></p-button>
+            </div>
+            <div style="margin-right: 10px; float: right">
+                <p-button label="CANCEL" (click)="resetHandler()"></p-button>
+            </div>
+            <div style="margin-right: 10px; float: right">
+                <p-button label="RESET" (click)="resetHandler()"></p-button>
+            </div>
+        </div>
+    </div>
+    <hr class="ul-g-12" style="color: green; border: 1px solid; margin-top: -18px;">
+    <div class="ul-g-12 form-margin">
+        <div class="p-grid" [formGroup]="userTableDataForm">
+            <div class="p-col-4">
+                <label style="margin-right: 5px">Show</label>
+                <p-spinner formControlName="stepperVal" [step]="10" min="10" max="100"
+                           (onChange)="stepperChangeHandler()">
+                </p-spinner>
+                <label style="margin-left: 5px">entries</label>
+            </div>
+            <div class="p-col-4 p-offset-4">
+                <div class="pull-right">
+                    <label>
+                        <input type="text" size="30" pInputText formControlName="searchInput"
+                               placeholder="Search records" (change)="searchInputChangeHandler()"/>
+                    </label>
+                </div>
+            </div>
+            <div class="p-col-12">
+                <p-table [value]="users" [paginator]="true" [rows]="rowCount" sortField="name">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>NAME</th>
+                            <th>POSITION</th>
+                            <th>OFFICE</th>
+                            <th>AGE</th>
+                            <th>DATE</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-user>
+                        <tr>
+                            <td>{{user.name}}</td>
+                            <td>{{user.position}}</td>
+                            <td>{{user.office.label}}</td>
+                            <td style="text-align: right">{{user.age}}</td>
+                            <td style="text-align: right">{{user.date | date: 'dd/MM/yyyy'}}</td>
+                            <td style="text-align: center">
+                                <div style="cursor: pointer; color: blue; font-size: 1.25em;">
+                                    <i class="pi pi-pencil" (click)="editHandler(user.id)"></i>
+                                    <i class="pi pi-trash" style="color: red" (click)="deleteHandler(user.id)"></i>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</p-card>
 
-<router-outlet></router-outlet>
+<p-toast key="save" position="bottom-left"></p-toast>
+<p-toast key="delete" position="bottom-left"></p-toast>
+
+<p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
