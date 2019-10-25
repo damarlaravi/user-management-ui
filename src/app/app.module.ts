@@ -18,6 +18,7 @@ import {AutoCompleteModule} from 'primeng/autocomplete';
 import {HttpClientModule} from '@angular/common/http';
 import {OfficeService} from './service/office.service';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
+import {AgGridModule} from 'ag-grid-angular';
 
 @NgModule({
     declarations: [
@@ -38,7 +39,8 @@ import {ConfirmDialogModule} from 'primeng/confirmdialog';
         KeyFilterModule,
         SpinnerModule,
         AutoCompleteModule,
-        ConfirmDialogModule
+        ConfirmDialogModule,
+        AgGridModule.withComponents([])
     ],
     providers: [MessageService, OfficeService, ConfirmationService],
     bootstrap: [AppComponent]

@@ -2,7 +2,6 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Utils} from './utils/utils';
 import {ConfirmationService, MessageService} from 'primeng/api';
-import {OfficeInfo, User} from './app.interface';
 import {Subscription} from 'rxjs';
 import {OfficeService} from './service/office.service';
 
@@ -16,14 +15,12 @@ export class AppComponent implements OnInit, OnDestroy {
     public submitted = false;
     public userTableDataForm: FormGroup;
     public users = [];
-    public positions = [];
-    public rowCount = 10;
-    public results: OfficeInfo[] = [];
-    private officeData: Array<OfficeInfo> = [];
+    private gridApi;
+    private gridColumnApi;
+    public headerDefs: any[] = [];
+    public rowSelection = null;
     private officeServiceSubscription$: Subscription;
     private isFromEdit = false;
-    private clonedUsers: Array<User> = [];
-    private selectedRowId = null;
 
     constructor(private fb: FormBuilder, private ms: MessageService,
                 private officeService: OfficeService,
@@ -32,32 +29,26 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.positions = [
-            {label: 'Select Position', value: null},
-            {label: 'New York', value: 'NY'},
-            {label: 'Rome', value: 'RM'},
-            {label: 'London', value: 'LDN'},
-            {label: 'Istanbul', value: 'IST'},
-            {label: 'Paris', value: 'PRS'}
-        ];
 
         this.userManagementForm = this.fb.group({
-            name: ['', [Validators.required, Validators.minLength(3)]],
-            position: ['', [Validators.required]],
-            age: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(2)]],
-            office: ['', [Validators.required, Validators.minLength(1)]],
-            date: ['', [Validators.required]],
+            item: ['', [Validators.required, Validators.minLength(3)]],
+            description: ['', [Validators.required, Validators.minLength(3)]],
+            formulation: ['', [Validators.required, Validators.minLength(3)]],
+            batchNo: ['', [Validators.required, Validators.minLength(3)]],
         });
+
+        this.headerDefs = [
+            {headerName: 'Item', field: 'item', width: 200, checkboxSelection: true},
+            {headerName: 'Description', field: 'description', width: 200},
+            {headerName: 'Formulation', field: 'formulation', width: 200},
+            {headerName: 'Batch No', field: 'batchNo', width: 200}
+        ];
 
         this.userTableDataForm = this.fb.group({
             stepperVal: [10, [Validators.required]],
             searchInput: ['', []]
         });
-        this.users = Utils.getAllSavedUsers();
-        this.clonedUsers = JSON.parse(JSON.stringify(this.users));
-        this.officeServiceSubscription$ = this.officeService.getSearchData().subscribe((res) => {
-            this.officeData = res;
-        });
+
     }
 
     ngOnDestroy(): void {
@@ -69,16 +60,16 @@ export class AppComponent implements OnInit, OnDestroy {
         if (this.userManagementForm.valid) {
             const user = this.userManagementForm.value;
             user.id = Utils.getDynamicId();
-            console.log(user);
             if (this.isFromEdit) {
-                const findEditUserIndex = this.users.findIndex(userDetail => userDetail.id === this.selectedRowId);
+                const findEditUserIndex = this.users.findIndex(userDetail => userDetail.id === this.rowSelection.id);
                 this.users.splice(findEditUserIndex, 1, user);
             } else {
                 this.users.push(user);
             }
+            this.gridApi.setRowData(this.users);
             localStorage.setItem('user-management-info', JSON.stringify({users: this.users}));
             this.ms.add({key: 'save', severity: 'success', summary: 'User Info Saved', detail: 'User info saved successfully'});
-            this.selectedRowId = null;
+            this.rowSelection = null;
             this.isFromEdit = false;
             this.submitted = false;
             this.resetHandler();
@@ -89,46 +80,35 @@ export class AppComponent implements OnInit, OnDestroy {
         this.userManagementForm.reset();
     }
 
-    public stepperChangeHandler(): void {
-        this.rowCount = this.userTableDataForm.get('stepperVal').value;
-    }
-
-    public searchInputChangeHandler(): void {
-        // console.log(this.userTableDataForm.get('searchInput').value);
-        const searchInput = this.userTableDataForm.get('searchInput').value;
-        const filterData = JSON.parse(JSON.stringify(this.users));
-        if (searchInput) {
-            this.users = filterData.filter(userInfo => userInfo.name.toLowerCase().match(searchInput.toLowerCase()));
-        } else {
-            this.users = this.clonedUsers;
-        }
-    }
-
-    public editHandler(rowId): void {
-        const editedUserInfo = this.users.find(user => user.id === rowId);
-        this.userManagementForm.get('name').setValue(editedUserInfo.name);
-        this.userManagementForm.get('age').setValue(editedUserInfo.age);
-        this.userManagementForm.get('position').setValue(editedUserInfo.position);
-        this.userManagementForm.get('office').setValue(editedUserInfo.office);
-        console.log(this.results, editedUserInfo);
-        this.userManagementForm.get('date').setValue(new Date(editedUserInfo.date));
+    public editHandler(): void {
+        const editedUserInfo = this.users.find(user => user.id === this.rowSelection.id);
+        this.userManagementForm.patchValue(editedUserInfo);
         this.isFromEdit = true;
-        this.selectedRowId = rowId;
     }
 
-    public deleteHandler(rowId): void {
+    public onSelectionChanged(): void {
+        const selectedUsers = this.gridApi.getSelectedRows();
+        this.rowSelection = selectedUsers[0];
+    }
+
+    public onGridReady(params): void {
+        this.gridApi = params.api;
+        this.gridColumnApi = params.columnApi;
+        this.users = Utils.getAllSavedUsers();
+        // this.clonedUsers = JSON.parse(JSON.stringify(this.users));
+    }
+
+    public deleteHandler(): void {
         this.confirmService.confirm({
             message: 'Are you sure that you want to remove selected user?',
             accept: () => {
-                const deleteUserId = this.users.findIndex(userInfo => userInfo.id === rowId);
+                const deleteUserId = this.users.findIndex(userInfo => userInfo.id === this.rowSelection.id);
                 this.users.splice(deleteUserId, 1);
+                this.gridApi.setRowData(this.users);
+                this.resetHandler();
                 localStorage.setItem('user-management-info', JSON.stringify({users: this.users}));
                 this.ms.add({key: 'delete', severity: 'error', summary: 'User removed', detail: 'User removed successfully'});
             }
         });
-    }
-
-    public search(e): void {
-        this.results = this.officeData.filter((officeObj) => officeObj.label.toLowerCase().match(e.query.toLowerCase()));
     }
 }

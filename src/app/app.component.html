@@ -5,30 +5,30 @@
         <div class="p-grid form-margin">
             <div class="p-col-4">
                 <span class="ui-float-label">
-                    <input id="name-input" type="text" size="30" pInputText class="p-col-11" formControlName="name">
-                    <label for="name-input">Name</label>
+                    <input id="item-input" type="text" size="30" pInputText class="p-col-11" formControlName="item">
+                    <label for="item-input">Item</label>
                 </span>
-                <small class="text-danger" *ngIf="submitted && userManagementForm.get('name')?.errors">
-                    Please enter atleast 4 letters.
+                <small class="text-danger" *ngIf="submitted && userManagementForm.get('item')?.errors">
+                    Please enter at least 4 letters.
                 </small>
             </div>
             <div class="p-col-4">
                 <span class="ui-float-label">
-                    <input id="position-input" type="text" size="30" pInputText class="p-col-11" formControlName="position">
-                    <label for="position-input">Position</label>
+                    <input id="description-input" type="text" size="30" pInputText class="p-col-11"
+                           formControlName="description">
+                    <label for="description-input">Description</label>
                 </span>
-                <small class="text-danger" *ngIf="submitted && userManagementForm.get('position')?.errors">
-                    Please enter atleast 4 letters.
+                <small class="text-danger" *ngIf="submitted && userManagementForm.get('description')?.errors">
+                    Please enter at least 4 letters.
                 </small>
             </div>
             <div class="p-col-4">
                 <span class="ui-float-label">
-                    <p-autoComplete id="office-input" formControlName="office" [suggestions]="results"
-                                    (completeMethod)="search($event)" field="label" forceSelection="true">
-                    </p-autoComplete>
-                    <label for="office-input">Office</label>
+                    <input id="formulation-input" type="text" size="30" pInputText class="p-col-11"
+                           formControlName="formulation">
+                    <label for="formulation-input">Formulation</label>
                 </span>
-                <small class="text-danger" *ngIf="submitted && userManagementForm.get('office')?.errors">
+                <small class="text-danger" *ngIf="submitted && userManagementForm.get('formulation')?.errors">
                     Please select office
                 </small>
             </div>
@@ -36,22 +36,12 @@
         <div class="p-grid form-margin">
             <div class="p-col-4">
                 <span class="ui-float-label ">
-                    <input id="age-input" type="text" size="30" pInputText class="p-col-11" formControlName="age"
-                           maxlength="2" pKeyFilter="int">
-                    <label for="age-input">Age</label>
+                    <input id="batchNo-input" type="text" size="30" pInputText class="p-col-11"
+                           formControlName="batchNo">
+                    <label for="batchNo-input">Batch No</label>
                 </span>
-                <small class="text-danger" *ngIf="submitted && userManagementForm.get('age')?.errors">
+                <small class="text-danger" *ngIf="submitted && userManagementForm.get('batchNo')?.errors">
                     Please enter valid user age 0 t0 99
-                </small>
-            </div>
-            <div class="p-col-4">
-                <span class="ui-float-label ">
-                    <p-calendar id="date-input" showIcon="true" dateFormat="dd/mm/yy" formControlName="date">
-                    </p-calendar>
-                    <label for="date-input">Date</label>
-                </span>
-                <small class="text-danger" *ngIf="submitted && userManagementForm.get('date')?.errors">
-                    Please select date
                 </small>
             </div>
         </div>
@@ -63,60 +53,32 @@
             <div style="float: right">
                 <p-button label="SAVE" (click)="saveHandler()"></p-button>
             </div>
-            <div style="margin-right: 10px; float: right">
-                <p-button label="CANCEL" (click)="resetHandler()"></p-button>
-            </div>
-            <div style="margin-right: 10px; float: right">
-                <p-button label="RESET" (click)="resetHandler()"></p-button>
-            </div>
+
         </div>
     </div>
     <hr class="ul-g-12" style="color: green; border: 1px solid; margin-top: -18px;">
     <div class="ul-g-12 form-margin">
         <div class="p-grid" [formGroup]="userTableDataForm">
-            <div class="p-col-4">
-                <label style="margin-right: 5px">Show</label>
-                <p-spinner formControlName="stepperVal" [step]="10" min="10" max="100"
-                           (onChange)="stepperChangeHandler()">
-                </p-spinner>
-                <label style="margin-left: 5px">entries</label>
-            </div>
-            <div class="p-col-4 p-offset-4">
-                <div class="pull-right">
-                    <label>
-                        <input type="text" size="30" pInputText formControlName="searchInput"
-                               placeholder="Search records" (change)="searchInputChangeHandler()"/>
-                    </label>
+            <div class="p-col-4 p-offset-8">
+                <div style="margin-right: 10px; float: right">
+                    <p-button label="Delete" (click)="deleteHandler()"></p-button>
+                </div>
+                <div style="margin-right: 10px; float: right">
+                    <p-button label="Edit" (click)="editHandler()"></p-button>
                 </div>
             </div>
             <div class="p-col-12">
-                <p-table [value]="users" [paginator]="true" [rows]="rowCount" sortField="name">
-                    <ng-template pTemplate="header">
-                        <tr>
-                            <th>NAME</th>
-                            <th>POSITION</th>
-                            <th>OFFICE</th>
-                            <th>AGE</th>
-                            <th>DATE</th>
-                            <th>ACTIONS</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-user>
-                        <tr>
-                            <td>{{user.name}}</td>
-                            <td>{{user.position}}</td>
-                            <td>{{user.office.label}}</td>
-                            <td style="text-align: right">{{user.age}}</td>
-                            <td style="text-align: right">{{user.date | date: 'dd/MM/yyyy'}}</td>
-                            <td style="text-align: center">
-                                <div style="cursor: pointer; color: blue; font-size: 1.25em;">
-                                    <i class="pi pi-pencil" (click)="editHandler(user.id)"></i>
-                                    <i class="pi pi-trash" style="color: red" (click)="deleteHandler(user.id)"></i>
-                                </div>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
+                <ag-grid-angular
+                    style="width: 800px; height: 300px;"
+                    class="ag-theme-balham"
+                    #agGrid
+                    id="userGrid"
+                    [rowData]="users"
+                    [rowSelection]="rowSelection"
+                    (selectionChanged)="onSelectionChanged()"
+                    [columnDefs]="headerDefs"
+                    (gridReady)="onGridReady($event)">
+                </ag-grid-angular>
             </div>
         </div>
     </div>

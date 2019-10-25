@@ -1,10 +1,9 @@
 export interface User {
     id: number;
-    name: string;
-    position: string;
-    office: string;
-    age: number;
-    date: Date;
+    item: string;
+    description: string;
+    formulation: string;
+    batchNo: string;
 }
 
 export interface OfficeInfo {
